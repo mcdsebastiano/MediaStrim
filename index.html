@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/player.css" />
+    <link rel="stylesheet" href="css/playlist.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   
+  </head>
+
+  <body>
+  
+    <!-- sidebar nav-->
+    <ul id="nav" class="nav-expand in">
+      <!-- hidden nav -->
+      <li class="expanded expanded-pos">
+        <div class="nav-title">
+          <h1>Hello,</h1>
+          <h2 class="username">Montana</h2>
+        </div>
+        
+        <ul>
+          <li><a href="javascript:void(0);" onclick="showPlaylist()">Show Playlist</a></li>
+          <!-- more options/settings -->
+         </ul>
+      </li>
+      
+      <!-- visible nav -->
+      <li><button class="nav-item link" onclick="navSlide()"><i class="fas fa-bars fa-2x"></i></button> </li>
+      <li><button class="nav-item link" onclick="load(HOME)"><i class="fas fa-home fa-2x"></i></button></li>
+      <li><button class="nav-item link" onclick="load(MOVIES)"><i class="fas fa-film fa-2x"></i></button></li>
+      <li><button class="nav-item link" onclick="load(SERIES)"><i class="fas fa-tv fa-2x"></i></button></li>
+
+      <!-- search bar -->
+        <li class="hidden" style="background-color: #28292C;">
+          <input type="text" class="nav-item searchbar" onfocus="searchSlide()" placeholder="search..." id="search-input" onkeyup="searchTitles(this.value)">
+          <button type="submit" class="nav-item link" id="search">
+            <i class="fas fa-search fa-2x"></i>
+          </button>
+          
+          <div id="search-results" class="hidden"></div>
+          
+        </li>
+
+    </ul>
+
+    <!-- MIDDLE CONTAINER -->
+    <div id="content">
+      <div id="container"></div>
+    </div>
+
+    <!-- MEDIA PLAYER -->
+    <div class="popup-modal modal-pos-max">
+      <div class="modal-container">
+
+        <div class="popup-modal-header header-pos-max op-0">
+          <span class="text"></span>
+          <span class="controls pr-8" id="playlist-select" onclick="showPlaylist()"><i class="fas fa-list"></i></span>
+          <span class="controls pr-4" id="min-max" onclick="minimize()"><i class="fas fa-compress-alt"></i></span>
+          <span class="controls" id="close" onclick="hide()"><i class="fas fa-window-close"></i></span>
+        </div>
+
+        <div class="popup-modal-footer footer-pos-max op-0">
+          <button id="play-pause"><i class="fas fa-play fa-lg"></i></button>
+          <button id="skip-prev"><i class="fas fa-backward fa-lg"></i></button>
+          <button id="skip-next"><i class="fas fa-forward fa-lg"></i></button>
+
+          <div class="trackbar">
+            <div class="full">
+              <div class="track">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+
+          <time>00:00:00 / 00:00:00</time>
+
+          <button id="volume-button"><i class="fas fa-volume-up fa-lg"></i></button>
+
+          <div class="volume-container">
+            <div class="full">
+              <div class="volume-slider"></div>
+            </div>
+          </div>
+        </div>
+
+        <video class="modal-content" id="media" autoplay=false></video>
+      </div>
+    </div>
+
+    <!-- PLAYLIST -->
+    <div class="playlist-container">
+      <div class="playlist-modal">
+
+        <div class="playlist-modal-LHS">
+          <div class="playlist-video-container"></div>
+        </div>
+
+        <div class="span-2">
+          <div class="playlist-modal-RHS">
+            <ul class="playlist-tracks"></ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="js/init.js"></script>
+    <script src="js/xhr.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/events.js"></script>
+  
+  </body>
+</html>

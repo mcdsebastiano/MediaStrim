@@ -1,0 +1,135 @@
+
+.span-2 {
+  grid-column: auto / span 2;
+}
+
+.window-controls-container {
+  position: absolute;
+  cursor: pointer;
+  left: 10px;
+  top: 5px;
+}
+
+.playlist-window-controls {
+  opacity: 0.8;
+  text-shadow: 1px 1px 2px black;
+  cursor: pointer;
+  background: none;
+  outline: none;
+  border: none;
+  color: white;
+  text-align: right;
+  font-size: 20pt;
+}
+
+.playlist-window-controls:hover { 
+  color: #ffa500;
+}
+
+.playlist-tracks a {
+  display: block;
+  padding: 18px;
+}
+
+.playlist button {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  color: red;
+}
+
+
+.playlist-video {
+  height: auto;
+  width: 100%;
+}
+
+.playlist-modal-LHS {
+  box-shadow: 0.1em 0 1em rgba(0, 0, 0, 0.4);
+  background-color: #222222;
+  overflow: hidden;
+}
+
+.playlist-modal-RHS {
+  scroll-behavior: smooth;
+  justify-content: center;
+  flex-direction: rows;
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+}
+
+.playlist-container {
+  position: absolute;
+  display: none;
+  height: 100%;
+  width: 100%;
+  z-index: 11;
+  left: 0;
+  top: 0;
+}
+
+.playlist-tracks .playlist {
+  /* box-shadow: 0.2em  0.2em 0.3em rgba(0, 0, 0, 0.15), */
+             /* -0.2em -0.2em 0.3em 0.1em rgba(255,255,255,0.33);   */
+  /* border-radius: 2em; */
+}
+
+.playlist-tracks .active {
+  /* box-shadow: inset  0.1em  0.1em 0.3em 0.2em rgba(0, 0, 0, 0.11), */
+              /* inset -0.2em -0.2em 0.3em 0.2em rgba(255, 255, 255, 0.1); */
+  /* background-color: rgba(0, 0, 0, 0.075);   */
+  color: #398DD7;
+}
+
+.playlist-tracks {  
+  list-style: none;
+  width: 133%;
+}
+
+.playlist {
+  border-bottom: 1px solid #555555;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  flex-direction: row;
+}
+
+.playlist > * {
+  margin: 0.5em;  
+}
+
+.playlist-modal {
+  grid-template-columns: repeat(3, 1fr);
+  background-color: #dddddd;
+  overflow: hidden;
+  display: grid;
+  height: 100vh;
+  width: 100vw;
+}
+
+.playlist-tracks .active a {
+  color: #666666;
+}
+
+.playlist-tracks .active a:hover {
+  color: #398DD7;
+}
+
+@media (max-width: 860px) {
+  .playlist-modal {
+    grid-row-gap: 0;
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .playlist-video {
+    height: 50vh;
+  }
+  .playlist-modal-LHS {
+    box-shadow: 0 0.4em 2em rgba(0, 0, 0, 0.2);
+    height: 50vh;
+  }
+  .playlist-modal-RHS {
+    height: 50vh;
+    border-top: 1px solid #000000;
+  }
+}
