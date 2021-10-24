@@ -17,7 +17,7 @@ function slideUpDown() {
 
 function searchSlide() {
     if (!searchBar.parentElement.classList.contains('expanded')) {
-        
+
         slideUpDown();
     }
     if (searchInput !== document.activeElement) {
@@ -89,17 +89,6 @@ function showPlaylist() {
     let found;
     let listID = 0;
 
-    if (typeof source !== 'undefined') {
-        for (let key of Object.keys(watchHistory)) {
-            for (let i = 0; i < watchHistory[key].length; i++) {
-                if (watchHistory[key][i].source == source.src) {
-                    listID = watchHistory[key][i].playID;
-                    break;
-                }
-            }
-        }
-    }
-
     console.log(listID)
 
     const windowControlsContainer = document.createElement('li');
@@ -115,6 +104,17 @@ function showPlaylist() {
     playlistWindowControls.appendChild(closePlaylistWindow);
     windowControlsContainer.appendChild(playlistWindowControls);
     playlistTracks.appendChild(windowControlsContainer);
+
+    if (typeof source !== 'undefined') {
+        for (let key of Object.keys(watchHistory)) {
+            for (let i = 0; i < playlistTracks.length; i++) {
+                if (watchHistory[key][i].source == source.src) {
+                    listID = watchHistory[key][i].playID;
+                    break;
+                }
+            }
+        }
+    }
 
     playlistTracks.children[listID].scrollIntoView();
 

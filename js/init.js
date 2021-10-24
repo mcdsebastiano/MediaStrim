@@ -1,5 +1,4 @@
-const OMDB_API_KEY= 'fdfec37c';
-const FONT_AWESOME_URI = 'https://kit.fontawesome.com/28a6f6ba3a.js';
+const OMDB_API_KEY= '';
 const HOME = '.\/Videos';
 const MOVIES = '.\/Videos\/Movies';
 const SERIES = '.\/Videos\/Series';
@@ -18,7 +17,6 @@ const volumeIcon = document.getElementsByClassName('fa-volume-up')[0];
 const volumeButton = document.getElementById('volume-button');
 
 const compressExpand = document.getElementsByClassName('fa-compress-alt')[0];
-const sel = document.getElementById('playlist-select');
 const minMaxIcon = document.getElementById('min-max');
 const closeIcon = document.getElementById('close');
 
@@ -94,14 +92,7 @@ let prevPage = currPage;
       History: {}
     });
   }
-  
-  if (typeof FONT_AWESOME_URI !== 'undefined' && FONT_AWESOME_URI !== '' && FONT_AWESOME_URI.trim().length !== 0) {
-    const fa = document.createElement('script');
-    fa.setAttribute('crossorigin', 'anonymous');
-    fa.src = FONT_AWESOME_URI;
-    document.head.appendChild(fa);
-  }
-  
+    
   function dragElement(elmnt) {
     var pos1 = 0,
     pos2 = 0,

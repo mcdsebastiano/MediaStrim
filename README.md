@@ -1,7 +1,7 @@
 # MediaStrim
 ---
 
-Mediastrim is a media server by the simplest defintions: A very small, browser-based media server & viewer built entirely with Vanilla HTML/CSS/JS and PHP.
+ A very small, browser-based media viewer built entirely with Vanilla HTML/CSS/JS and PHP.
 
 If you have a collection of videos you want to share across a personal network this has worked well for me. Its implementation is by no means glamourous and not meant for anything more than home use on a local network. It is simple enough to work practically anywhere, all the time without any major dependencies.
 
@@ -11,13 +11,9 @@ If you have a collection of videos you want to share across a personal network t
 - Custom playlists.
 - Draggable, mini-player allows simultaneous watching & browsing.
 - Saved timestamp location and watch history to pick up where you last left.
+- OMDB API to display cover art for your folders.
 
-#### Options 
-- FontAwesome API key to replace the default Unicode icons.
-- OMDB API key to display cover art for your folders.
-
-
-Optional variables can be found in `js/init.js`
+set the OMDB variable in `js/init.js`
 
 --- 
 

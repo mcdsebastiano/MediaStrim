@@ -1,11 +1,11 @@
 <?php
  
-require_once "init/_Media.php"; 
+require_once "init/Media.php"; 
 
 if(isset($_GET['dir'])) 
   $path = $_GET['dir'];
 else 
-  $path = './Videos';  
+  $path = 'Videos';  
 
 if(isset($_GET['q'])) {
     $q = $_GET['q'];

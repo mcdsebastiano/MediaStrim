@@ -1,10 +1,10 @@
-window.onkeydown = function (event) {
+window.onkeydown = event => {
     if (event.keyCode === 32) {
         playPause()
     }
 };
 
-searchIcon.addEventListener('click', function searchSubmit(event) {
+searchIcon.onclick = event => {
     if (searchInput.value.trim().length === 0) {
         event.preventDefault();
     }
@@ -15,12 +15,12 @@ searchIcon.addEventListener('click', function searchSubmit(event) {
     if (searchIcon.parentElement.classList.contains('expanded')) {
         searchInput.focus();
     }
-});
+};
 
 video.onclick = () => playPause();
 playButton.onclick  = () => playPause();
 
-trackbar.onclick    = (event) => {
+trackbar.onclick = event => {
     track.style.width = event.clientX - trackbar.getBoundingClientRect().x + 'px';
     const percent = track.getBoundingClientRect().width / trackbar.getBoundingClientRect().width;
     video.currentTime = video.duration * percent;

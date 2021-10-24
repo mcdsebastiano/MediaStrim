@@ -21,6 +21,8 @@ function load(page) {
 
                 function changeSource(id) {
 
+                    console.log(id);
+
                     if (id >= data.length || id < 0)
                         return;
 
@@ -45,8 +47,20 @@ function load(page) {
                         currentSrc.remove();
                     }
 
+                    const source = document.createElement('source');
+                    source.setAttribute('src', `${data[id].path}${data[id].source}`);
+                    document.getElementsByClassName('text')[0].textContent = data[id].title;
+                    video.appendChild(source);
+
+                    console.log(source)
+
+                    video.load();
+                    playPause();
+
+                    playlist[videoID].classList.remove('active');
+
                     foundID = -1;
-                    if (watchHistory[videoKey]) {
+                    if (typeof watchHistory[videoKey] !== 'undefined') {
                         for (let i = 0; i < watchHistory[videoKey].length; i++) {
                             let item = watchHistory[videoKey][i];
                             if (item.title == data[id].title) {
@@ -56,19 +70,6 @@ function load(page) {
                         }
                     }
 
-                    const source = document.createElement('source');
-                    source.setAttribute('src', `${data[id].path}${data[id].source}`);
-                    document.getElementsByClassName('text')[0].textContent = data[id].title;
-                    video.appendChild(source);
-
-                    video.load();
-                    playPause();
-
-                    playlist[id].classList.add('active');
-                    if (id != videoID) {
-                        playlist[videoID].classList.remove('active');
-                    }
-
                     if (foundID > -1) {
                         video.currentTime = watchHistory[data[id].path][foundID].timestamp;
                         videoID = watchHistory[data[id].path][foundID].videoID;
@@ -76,7 +77,7 @@ function load(page) {
 
                         videoID = id;
 
-                        if (watchHistory[data[id].path]) {
+                        if (typeof watchHistory[data[id].path] !== "undefined") {
                             watchHistory[data[id].path].push({
                                 title: data[id].title,
                                 timestamp: 0,
@@ -96,6 +97,7 @@ function load(page) {
                         }
                         video.currentTime = 0;
                     }
+                    playlist[id].classList.add('active');
                 }
 
                 data.forEach((item, i) => {
@@ -135,36 +137,24 @@ function load(page) {
 
                 let playID = Math.max.apply(Math, watchHistory[videoKey].map(item => item.videoID));
 
-                if (playID) {
-					//@Cleanup
+                if (typeof playID !== "undefined") {
                     const notificationHeader = document.createElement('div');
-                    notificationHeader.style.display = 'flex';
-                    notificationHeader.style.opacity = '0.8';
-                    notificationHeader.style.flexDirection = 'row';
-                    notificationHeader.style.position = 'absolute';
-                    notificationHeader.style.top = '0';
-                    notificationHeader.style.left = '0';
-                    notificationHeader.style.width = '100%';
-                    notificationHeader.style.height = '75px';
-                    notificationHeader.style.backgroundColor = '#444444';
-                    notificationHeader.style.zIndex = 11;
+                    
+                    notificationHeader.classList.add("notification-header");
 
                     const OKButton = document.createElement('button');
-                    OKButton.style.margin = '25px';
+                    OKButton.classList.add("notification-header", "ok-button");
                     OKButton.textContent = 'OK';
 
                     const cancelButton = document.createElement('button');
-                    cancelButton.style.background = 'none';
-                    cancelButton.style.border = 0;
-                    cancelButton.style.outline = 'none';
+                    cancelButton.classList.add("notification-header", "cancel-button");
+                    
                     const closeIcon = document.createElement('i');
-                    closeIcon.style.color = '#ffffff';
-                    closeIcon.classList.add('fas', 'fa-window-close', 'fa-2x');
+                    closeIcon.classList.add("close-icon", 'fas', 'fa-window-close', 'fa-2x');
                     cancelButton.appendChild(closeIcon);
 
                     const message = document.createElement('span');
-                    message.style.color = "#ffffff";
-                    message.style.margin = '30px';
+                    message.classList.add("notification-header", "message");
                     message.textContent = 'Continue where you last left?';
 
                     notificationHeader.appendChild(message);
@@ -188,7 +178,7 @@ function load(page) {
                 prevButton.onclick = () => changeSource(videoID - 1);
             } else {
 
-                if (currPage && page != currPage && page != prevPage) {
+                if (typeof currPage !== "undefined" && page != currPage && page != prevPage) {
                     prevPages.push(currPage);
                 }
 
@@ -225,10 +215,9 @@ function load(page) {
 
                 keys.forEach(async key => {
                     let temp = JSON.parse(JSON.stringify(data));
-					key = key.replace('\\', '\/');
                     const dirs = key.split("\/");
-					
-                    let str = '.\/Videos';
+
+                    let str = 'Videos';
                     let depth = dirs.length - 2;
 
                     currPage = page;
@@ -256,11 +245,10 @@ function load(page) {
                     fragment.appendChild(coverWrapper);
 
                     for (let i = 2; i < dirs.length; i++) {
-                        str += '\\' + dirs[i];
+                        str += '\/' + dirs[i];
                         temp = data[str];
                         if (!Number.isInteger(parseInt(key))) {
                             coverWrapper.onclick = (event) => {
-
                                 if (nav.classList.contains("out") === true) {
                                     event.preventDefault();
                                     navSlide();
@@ -282,8 +270,6 @@ function load(page) {
                     }
                     container.appendChild(fragment);
                     container.style.height = 'calc(100% - 5px)';
-                    // container.style.height = `${container.getBoundingClientRect().height - 6}px`;
-
 
                 });
                 content.appendChild(container);
