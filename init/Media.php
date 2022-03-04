@@ -1,6 +1,10 @@
 <?php 
 
 function getDirContents($dir, &$result = array()) {
+  if(!is_dir($dir)) {
+      return [];
+  }
+          
   $items = scandir($dir);
   foreach($items as $item => $name) {
     $path = $dir . DIRECTORY_SEPARATOR . $name;
@@ -9,10 +13,11 @@ function getDirContents($dir, &$result = array()) {
         continue;
       $result[] = new Media($name, $path);
     } else if(!contains($name, "Subs") && $name != "." && $name != ".." && contains($path, "Videos")) {
-		$path = str_replace("\\", "/", $path);
+        $path = str_replace("\\", "/", $path);
       getDirContents($path, $result[$path]);
     }
   }
+
   return $result;
 }
 
@@ -32,7 +37,6 @@ class Media {
 
   
 	function __construct($title, $path) {
-		$this->title = trim(preg_replace(Media::$tokens, ' ', $title)," ");
 		$path = str_replace("\\", "/", $path);
 		$this->path = substr($path, 0, strrpos($path, "/"));
 		$this->source = substr($path, strrpos($path, "/"));
