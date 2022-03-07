@@ -7,29 +7,29 @@ from "./PlayerController.js";
 import {
     printFormattedTime
 }
-from "./utils/Time.js";
+from "../utils/Time.js";
 
 import {
     removeAllChildrenFrom,
     undoFragment,
-    navButtons,
     container,
     fragment,
     content,
     modal
 }
-from "./utils/UI.js";
+from "../utils/UI.js";
 
 class ResourceLoader {
     constructor() {
         this.player = new Player();
-        this.playerController = new PlayerController(this.player),
+        this.playerController = new PlayerController(this.player);
         this.PageData = {
             curr: null,
             prev: null,
             prevPages: [],
-            
-        }
+        };
+
+        this.loadPlayerControls()
     };
 
     async newHttpRequest(obj) {
@@ -61,7 +61,7 @@ class ResourceLoader {
         });
 
         if (data.length === 0) {
-            throw new Error("Error loading source. No such directory found...");
+            throw new Error("Error loading source: Directory doesn't exist....");
         }
 
         if (typeof data[0] === "undefined") {
@@ -78,9 +78,7 @@ class ResourceLoader {
     async loadPage(data) {
 
         removeAllChildrenFrom(container);
-
-        modal.style.display = 'none';
-
+        
         undoFragment();
 
         const collection = await Promise.all(await this.getPosters(data));
@@ -92,12 +90,12 @@ class ResourceLoader {
         };
     }
 
-    refreshCollection() {
+    updateCollection() {
         container.appendChild(fragment);
         container.style.height = 'calc(100% - 5px)';
     }
 
-    refreshPage() {
+    updatePage() {
         content.appendChild(container);
     }
 
@@ -159,20 +157,48 @@ class ResourceLoader {
                 this.player.controller.togglePlaying();
         }
 
-        this.player.Volume.container.onclick = event => this.playerController.adjustVolume(event.clientX);
-        this.player.Volume.button.onclick = () => this.playerController.toggleMute();
+        this.player.controls.Play.button.onclick = () => this.playerController.togglePlay();
+        this.player.controls.Prev.button.onclick = () => this.playerController.prevVideo();
+        this.player.controls.Next.button.onclick = () => this.playerController.nextVideo();
 
-        this.player.Play.button.onclick = () => this.playerController.togglePlay();
-        this.player.Next.button.onclick = () => this.playerController.nextVideo();
-        this.player.Prev.button.onclick = () => this.playerController.prevVideo();
+        this.player.controls.TrackBar.bar.onclick = event => this.playerController.moveThumb(event.clientX);
+
         this.player.Video.onclick = () => this.playerController.togglePlay();
 
-        this.player.TrackBar.bar.onclick = event => this.playerController.moveThumb(event.clientX);
+        this.player.controls.Volume.container.onclick = event => this.playerController.adjustVolume(event.clientX);
+        this.player.controls.Volume.button.onclick = () => this.playerController.toggleMute();
+
         this.player.Video.addEventListener("timeupdate", () => {
-            this.player.TrackBar.track.style.width = this.player.Video.currentTime / this.player.Video.duration * 100 + '%';
+            this.player.controls.TrackBar.track.style.width = this.player.Video.currentTime / this.player.Video.duration * 100 + '%';
             this.player.CurrentTime.textContent = `${printFormattedTime(this.player.Video.currentTime)}`;
         });
+
         this.player.Video.onended = () => this.playerController.nextVideo();
+
+        // TITLEBAR & WINDOW CONTROLS
+
+        this.player.titleBar.windowControls.minimizeMaximize.button.onclick = () => {
+            if (this.player.minimized === false) {
+                this.player.titleBar.windowControls.minimizeMaximize.icon.classList.replace('fa-compress-alt', 'fa-expand-alt');
+                this.player.titleBar.self.classList.replace('header-pos-max', 'header-pos-min');
+                this.player.controls.self.classList.replace('footer-pos-max', 'footer-pos-min');
+                modal.classList.replace('modal-pos-max', 'modal-pos-min');
+                modal.style.left = '65%';
+                modal.style.top = '65%';
+                this.player.minimized = true;
+            } else {
+                this.player.titleBar.windowControls.minimizeMaximize.icon.classList.replace('fa-expand-alt', 'fa-compress-alt');
+                this.player.titleBar.self.classList.replace('header-pos-min', 'header-pos-max');
+                this.player.controls.self.classList.replace('footer-pos-min', 'footer-pos-max');
+                modal.classList.replace('modal-pos-min', 'modal-pos-max');
+                modal.style.left = '0px';
+                modal.style.top = '0px';
+                this.player.minimized = false;
+            }
+        };
+
+        this.player.titleBar.windowControls.playlist.button.onclick = () => console.log("clicked!");
+        this.player.titleBar.windowControls.close.button.onclick = () => modal.style.display = "none";
     }
 
 };

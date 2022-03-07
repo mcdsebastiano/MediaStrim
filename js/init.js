@@ -1,49 +1,59 @@
-import { nav } from "./utils/UI.js";
+import {
+    nav
+}
+from "./utils/UI.js";
 import {
     ResourceLoader,
     MOVIES,
     SERIES,
     HOME,
 }
-from "./ResourceLoader.js";
+from "./modules/ResourceLoader.js";
 
-const loader = new ResourceLoader();
+(async() => {
 
-nav.homeButton.onClick(async() => await load(HOME));
-nav.seriesButton.onClick(async() => await load(MOVIES));
-nav.moviesButton.onClick(async() => await load(SERIES));
+    const loader = new ResourceLoader();
+    
+    nav.slider.onclick = () => {
+        nav.self.classList.toggle('in');
+        nav.self.classList.toggle('out');
+    }
+  
+    nav.homeButton.onclick = async() => await load(HOME);
+    nav.moviesButton.onclick = async() => await load(MOVIES);
+    nav.seriesButton.onclick = async() => await load(SERIES);
 
-async function load(page) {
-    try {
+    async function load(page) {
+        try {
 
-        const data = await loader.getPage(page);
+            const data = await loader.getPage(page);
 
-        if (typeof data[0] !== "undefined") {
+            if (typeof data[0] !== "undefined") {
 
-            loader.loadPlayer(data);
-            loader.loadPlayerControls();
+                loader.loadPlayer(data);
 
-        } else {
+            } else {
 
-            const {
-                collection,
-                keys
-            } = await loader.loadPage(data);
+                const {
+                    collection,
+                    keys
+                } = await loader.loadPage(data);
 
-            for (let i = 0; i < keys.length; i++) {
-                const Poster = loader.createPoster(collection[i].Poster);
-                Poster.onClick(async() => await load(keys[i]));
-                loader.refreshCollection();
+                for (let i = 0; i < keys.length; i++) {
+                    const Poster = loader.createPoster(collection[i].Poster);
+                    Poster.onClick(async() => await load(keys[i]));
+                    loader.updateCollection();
+                }
+
+                loader.updatePage()
             }
 
-            loader.refreshPage()
-        }
+        } catch (err) {
+            console.error(err);
 
-    } catch (err) {
-        console.error(err);
+        }
 
     }
 
-}
-
-await load(SERIES + "\/Breaking Bad");
+    await load(HOME);
+})();

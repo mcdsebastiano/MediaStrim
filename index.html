@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -28,20 +28,20 @@
         </div>
         
         <ul>
-          <li><a href="javascript:void(0);" onclick="showPlaylist()">Show Playlist</a></li>
+          <li><a href="javascript:void(0);">Show Playlist</a></li>
           <!-- more options/settings -->
          </ul>
       </li>
       
       <!-- visible nav -->
-      <li><button class="nav-item link" onclick="navSlide()"><i class="fas fa-bars fa-2x"></i></button> </li>
-      <li><button class="nav-item link" onclick="load(HOME)"><i class="fas fa-home fa-2x"></i></button></li>
-      <li><button class="nav-item link" onclick="load(MOVIES)"><i class="fas fa-film fa-2x"></i></button></li>
-      <li><button class="nav-item link" onclick="load(SERIES)"><i class="fas fa-tv fa-2x"></i></button></li>
+      <li><button class="nav-item link"><i class="fas fa-bars fa-2x"></i></button></li>
+      <li><button class="nav-item link" id="home"><i class="fas fa-home fa-2x"></i></button></li>
+      <li><button class="nav-item link" id="movies"><i class="fas fa-film fa-2x"></i></button></li>
+      <li><button class="nav-item link" id="series"><i class="fas fa-tv fa-2x"></i></button></li>
 
       <!-- search bar -->
         <li class="hidden" style="background-color: #28292C;">
-          <input type="text" class="nav-item searchbar" onfocus="searchSlide()" placeholder="search..." id="search-input" onkeyup="searchTitles(this.value)">
+          <input type="text" class="nav-item searchbar" placeholder="search..." id="search-input" onkeyup="searchTitles(this.value)">
           <button type="submit" class="nav-item link" id="search">
             <i class="fas fa-search fa-2x"></i>
           </button>
@@ -56,46 +56,46 @@
     <div id="content">
       <div id="container"></div>
     </div>
-
-    <!-- MEDIA PLAYER -->
+    
+    <!-- PlAYER -->
     <div class="popup-modal modal-pos-max">
-      <div class="modal-container">
+          <div class="modal-container">
 
-        <div class="popup-modal-header header-pos-max op-0">
-          <span class="text"></span>
-          <span class="controls pr-8" id="playlist-select" onclick="showPlaylist()"><i class="fas fa-list"></i></span>
-          <span class="controls pr-4" id="min-max" onclick="minimize()"><i class="fas fa-compress-alt"></i></span>
-          <span class="controls" id="close" onclick="hide()"><i class="fas fa-window-close"></i></span>
-        </div>
+            <div class="title-bar header-pos-max op-0">
+              <span class="text"></span>
+              <span class="controls pr-8" id="show-playlist"><i class="fas fa-list"></i></span>
+              <span class="controls pr-4" id="min-max"><i class="fas fa-compress-alt"></i></span>
+              <span class="controls" id="close"><i class="fas fa-window-close"></i></span>
+            </div>
 
-        <div class="popup-modal-footer footer-pos-max op-0">
-          <button id="play-pause"><i class="fas fa-play fa-lg"></i></button>
-          <button id="skip-prev"><i class="fas fa-backward fa-lg"></i></button>
-          <button id="skip-next"><i class="fas fa-forward fa-lg"></i></button>
+            <div class="player-controls footer-pos-max op-0">
+              <button id="play-pause"><i class="fas fa-play fa-lg"></i></button>
+              <button id="skip-prev"><i class="fas fa-backward fa-lg"></i></button>
+              <button id="skip-next"><i class="fas fa-forward fa-lg"></i></button>
 
-          <div class="trackbar">
-            <div class="full">
-              <div class="track">
-                <div class="circle"></div>
+              <div class="trackbar">
+                <div class="full">
+                  <div class="track">
+                    <div class="circle"></div>
+                  </div>
+                </div>
+              </div>
+
+              <time>00:00:00</time>
+
+              <button id="volume-button"><i class="fas fa-volume-up fa-lg"></i></button>
+
+              <div class="volume-container">
+                <div class="full">
+                  <div class="volume-slider"></div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <time>00:00:00 / 00:00:00</time>
-
-          <button id="volume-button"><i class="fas fa-volume-up fa-lg"></i></button>
-
-          <div class="volume-container">
-            <div class="full">
-              <div class="volume-slider"></div>
-            </div>
-          </div>
+            <video class="modal-content" id="media"></video>
         </div>
-
-        <video class="modal-content" id="media"></video>
-      </div>
     </div>
-
+    
     <!-- PLAYLIST -->
     <div class="playlist-container">
       <div class="playlist-modal">
@@ -112,11 +112,8 @@
 
       </div>
     </div>
-
-    <script src="js/init.js"></script>
-    <script src="js/xhr.js"></script>
-    <script src="js/helpers.js"></script>
-    <script src="js/events.js"></script>
-  
+    
+    <script src="js/init.js" type="module"></script>
+    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
   </body>
 </html>
