@@ -1,31 +1,35 @@
 import {
+    ResourceLoader
+}
+from "./modules/ResourceLoader.js";
+import {
+    backButton,
     nav
 }
 from "./utils/UI.js";
-import {
-    ResourceLoader,
-    MOVIES,
-    SERIES,
-    HOME,
-}
-from "./modules/ResourceLoader.js";
 
-(async() => {
+const HOME = ".\/Videos";
+const MUSIC = ".\/Music";
+const MOVIES = ".\/Videos\/Movies";
+const SERIES = ".\/Videos\/Series";
 
-    const loader = new ResourceLoader();
-    
-    nav.slider.onclick = () => {
-        nav.self.classList.toggle('in');
-        nav.self.classList.toggle('out');
+(async(loader) => {
+
+    async function loadPage(page) {
+        if (loader.PageData.curr == page) 
+            return;
+
+        return await load(page);
     }
-  
-    nav.homeButton.onclick = async() => await load(HOME);
-    nav.moviesButton.onclick = async() => await load(MOVIES);
-    nav.seriesButton.onclick = async() => await load(SERIES);
+
+    nav.slider.onclick = () => nav.toggle();
+    nav.homeButton.onclick = async() => await loadPage(HOME);
+    nav.moviesButton.onclick = async() => await loadPage(MOVIES);
+    nav.seriesButton.onclick = async() => await loadPage(SERIES);
+    nav.musicButton.onclick = async() => await loadPage(MUSIC);
 
     async function load(page) {
         try {
-
             const data = await loader.getPage(page);
 
             if (typeof data[0] !== "undefined") {
@@ -39,21 +43,38 @@ from "./modules/ResourceLoader.js";
                     keys
                 } = await loader.loadPage(data);
 
-                for (let i = 0; i < keys.length; i++) {
-                    const Poster = loader.createPoster(collection[i].Poster);
-                    Poster.onClick(async() => await load(keys[i]));
-                    loader.updateCollection();
+                if (loader.PageData.prevPages.length > 0) 
+                    backButton.show();
+                else if (loader.PageData.prevPages.length === 0) 
+                    backButton.hide();
+                
+                backButton.self.onclick = async() => await load(loader.prevPage);
+
+                for (let i = 0; i < collection.length; i++) {
+                    const Poster = loader.createPoster(collection[i]);
+                    Poster.info.onclick = (event) => console.log(collection[i].Plot); ;
+                    Poster.plus.onclick = async(event) => loader.controller.setTracks(loader.player, await loader.getPage(keys[i]));
+                    Poster.wrapper.onclick = async(event) => {
+                        if (event.target.classList.contains("poster") === true) 
+                            return;
+
+                        if (nav.self.classList.contains("out")) {
+                            nav.toggle();
+                            return;
+                        }
+
+                        await load(keys[i]);
+                    };
                 }
 
                 loader.updatePage()
+                
             }
-
         } catch (err) {
             console.error(err);
-
         }
-
     }
-
+    
     await load(HOME);
-})();
+
+})(new ResourceLoader());

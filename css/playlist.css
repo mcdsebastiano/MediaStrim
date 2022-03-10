@@ -26,6 +26,25 @@
   color: #ffa500;
 }
 
+#repeat-one::after {
+    
+    content: ' \1F501';
+    background-color: red;
+    color: white;
+    box-sizing: border-box;
+}
+
+#playlist-close {
+  color: white;
+  position: absolute;
+  left: 1%;
+  top: 1%;
+  font-size: 16pt;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .playlist-tracks a {
   display: block;
   padding: 18px;
@@ -39,9 +58,10 @@
 }
 
 
-.playlist-video {
-  height: auto;
-  width: 100%;
+.playlist-video-container {
+  background-color: black;
+  height: 50vh;
+  width: auto;
 }
 
 .playlist-modal-LHS {

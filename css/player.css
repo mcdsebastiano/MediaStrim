@@ -20,7 +20,7 @@ time {
   margin: 0;
 }
 
-.popup-modal {
+.player-modal {
   display:none;
   background-color: #000000;
   position: absolute;
@@ -115,7 +115,7 @@ time {
   border: none;
   color: white;
 }
-.popup-modal-footer button span {
+.player-controls button span {
   text-indent: -9999px;
 }
 
@@ -166,11 +166,11 @@ time {
   padding-left: -2em;
 }
 
-.popup-modal:hover .title-bar {
+.player-modal:hover .title-bar {
   opacity: 0.9;
 }
 
-.popup-modal:hover .player-controls {
+.player-modal:hover .player-controls {
   opacity: 0.9;
 }
 

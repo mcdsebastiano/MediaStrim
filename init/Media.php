@@ -9,11 +9,13 @@ function getDirContents($dir, &$result = array()) {
   foreach($items as $item => $name) {
     $path = $dir . DIRECTORY_SEPARATOR . $name;
     if(!is_dir($path)) {
-      if($name == "desktop.ini" || pathinfo($path)['extension'] == "srt") 
+      if($name == "desktop.ini" || pathinfo($path)['extension'] == "srt" || pathinfo($path)['extension'] == "jpg") 
         continue;
       $result[] = new Media($name, $path);
-    } else if(!contains($name, "Subs") && $name != "." && $name != ".." && contains($path, "Videos")) {
+    } else if(!contains($name, "Subs") && $name != "." && $name != ".." && contains($path, $dir)) {
         $path = str_replace("\\", "/", $path);
+        $path = str_replace(" ", "%20", $path);
+		$path = str_replace("&", "%26", $path);
       getDirContents($path, $result[$path]);
     }
   }
@@ -38,6 +40,8 @@ class Media {
   
 	function __construct($title, $path) {
 		$path = str_replace("\\", "/", $path);
+		$path = str_replace(" ", "%20", $path);
+		$path = str_replace("&", "%26", $path);
 		$this->path = substr($path, 0, strrpos($path, "/"));
 		$this->source = substr($path, strrpos($path, "/"));
 	}

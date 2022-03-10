@@ -1,8 +1,10 @@
+import "../custom/Poster.js";
+
 import {
     Player,
-    PlayerController
+    MediaController
 }
-from "./PlayerController.js";
+from "./Media.js";
 
 import {
     printFormattedTime
@@ -12,25 +14,30 @@ from "../utils/Time.js";
 import {
     removeAllChildrenFrom,
     undoFragment,
+    backButton,
     container,
     fragment,
     content,
-    modal
+    nav,
 }
 from "../utils/UI.js";
 
 class ResourceLoader {
     constructor() {
         this.player = new Player();
-        this.playerController = new PlayerController(this.player);
+        this.controller = new MediaController();
         this.PageData = {
-            curr: null,
-            prev: null,
+            curr: undefined,
+            prev: undefined,
             prevPages: [],
         };
-
-        this.loadPlayerControls()
+        this.coordinateEvents()
     };
+    
+    get prevPage() {
+        this.popPage();
+        return this.PageData.prev;
+    }
 
     async newHttpRequest(obj) {
         return new Promise((resolve, reject) => {
@@ -60,54 +67,64 @@ class ResourceLoader {
             url: `content.php?dir=${page}`
         });
 
-        if (data.length === 0) {
+        if (data.length === 0) 
             throw new Error("Error loading source: Directory doesn't exist....");
-        }
 
         if (typeof data[0] === "undefined") {
-
-            if (typeof this.PageData.curr !== null && page != this.PageData.curr && page != this.PageData.prev) {
+            if (typeof this.PageData.curr !== "undefined" && page !== this.PageData.curr && page !== this.PageData.prev) 
                 this.PageData.prevPages.push(this.PageData.curr);
-            }
+                
             this.PageData.curr = page;
 
         }
+
         return data;
     }
 
-    async loadPage(data) {
+    loadPlayer(data) {
+        if (this.player.minimized === false && backButton.visible) 
+            backButton.hide();
 
-        removeAllChildrenFrom(container);
+        if (this.player.visible == false)
+            this.player.show();
+
+        this.player.playlist.empty();
+        this.player.trackId = 0;
+
+        this.controller.setTracks(this.player, data);
+        this.controller.playTrack(this.player, 0);
+    }
+
+    async loadPage(data) {
+        if (this.PageData.prevPages.length > 0) 
+            backButton.show()
         
+        removeAllChildrenFrom(container);
         undoFragment();
 
-        const collection = await Promise.all(await this.getPosters(data));
-        const keys = Object.keys(data);
-
         return {
-            collection,
-            keys
+            collection: await Promise.all(await this.getPosters(data)),
+            keys: Object.keys(data)
         };
     }
 
-    updateCollection() {
+    updatePage() {
         container.appendChild(fragment);
         container.style.height = 'calc(100% - 5px)';
-    }
-
-    updatePage() {
         content.appendChild(container);
     }
 
     popPage() {
+        if(this.PageData.prevPages.length === 0) 
+            return;
+        
         this.PageData.prev = this.PageData.prevPages.pop();
     }
 
     async getPosters(data) {
         return Object.keys(data).map(async(key) => {
-            if (data[key] === null) {
+            if (data[key] === null) 
                 data[key] = {};
-            }
 
             data[key].title = key.split("\/").pop();
             const search = data[key].title.replace(/\s/gi, '%20');
@@ -118,98 +135,64 @@ class ResourceLoader {
         });
     }
 
-    createPoster(url) {
-
-        const Poster = {
-            cover: document.createElement('div'),
-            title: document.createElement('p'),
-            wrapper: document.createElement('div'),
-            onClick: async function (fn) {
-                Poster.wrapper.addEventListener("click", () => {
-                    fn()
-                });
-            }
-        };
-
-        Poster.wrapper.appendChild(Poster.cover);
-
-        Poster.cover.classList.add("cover");
-        Poster.cover.style.backgroundImage = "url('" + url + "')";
-        Poster.cover.style.backgroundSize = '100% 100%';
-
-        fragment.appendChild(Poster.wrapper);
-
-        return Poster;
+    createPoster(obj) {
+        const poster = document.createElement("poster-img");
+        poster.set(obj);
+        fragment.appendChild(poster);
+        return poster;
     }
 
-    loadPlayer(data) {
-        modal.style.display = "block";
-
-        this.player.data = data;
-        this.player.trackId = 0;
-
-        this.playerController.playTrack(0);
-    }
-
-    loadPlayerControls() {
+    coordinateEvents() {
         window.onkeydown = event => {
             if (event.keyCode === 32)
                 this.player.controller.togglePlaying();
         }
 
-        this.player.controls.Play.button.onclick = () => this.playerController.togglePlay();
-        this.player.controls.Prev.button.onclick = () => this.playerController.prevVideo();
-        this.player.controls.Next.button.onclick = () => this.playerController.nextVideo();
+        this.player.controls.Play.button.onclick = () => this.controller.togglePlay(this.player);
+        this.player.controls.Prev.button.onclick = () => this.controller.prevTrack(this.player);
+        this.player.controls.Next.button.onclick = () => this.controller.nextTrack(this.player);
 
-        this.player.controls.TrackBar.bar.onclick = event => this.playerController.moveThumb(event.clientX);
+        this.player.controls.TrackBar.bar.onclick = event => this.controller.moveThumb(this.player, event.clientX);
 
-        this.player.Video.onclick = () => this.playerController.togglePlay();
+        this.player.Media.onclick = () => this.controller.togglePlay(this.player);
 
-        this.player.controls.Volume.container.onclick = event => this.playerController.adjustVolume(event.clientX);
-        this.player.controls.Volume.button.onclick = () => this.playerController.toggleMute();
+        this.player.controls.Volume.container.onclick = event => this.controller.adjustVolume(this.player, event.clientX);
+        this.player.controls.Volume.button.onclick = () => this.controller.toggleMute(this.player);
 
-        this.player.Video.addEventListener("timeupdate", () => {
-            this.player.controls.TrackBar.track.style.width = this.player.Video.currentTime / this.player.Video.duration * 100 + '%';
-            this.player.CurrentTime.textContent = `${printFormattedTime(this.player.Video.currentTime)}`;
+        this.player.Media.addEventListener("timeupdate", () => {
+            this.player.controls.TrackBar.track.style.width = this.player.Media.currentTime / this.player.Media.duration * 100 + '%';
+            this.player.CurrentTime.textContent = `${printFormattedTime(this.player.Media.currentTime)}`;
         });
 
-        this.player.Video.onended = () => this.playerController.nextVideo();
-
-        // TITLEBAR & WINDOW CONTROLS
+        this.player.Media.onended = () => this.controller.nextTrack(this.player);
 
         this.player.titleBar.windowControls.minimizeMaximize.button.onclick = () => {
             if (this.player.minimized === false) {
-                this.player.titleBar.windowControls.minimizeMaximize.icon.classList.replace('fa-compress-alt', 'fa-expand-alt');
-                this.player.titleBar.self.classList.replace('header-pos-max', 'header-pos-min');
-                this.player.controls.self.classList.replace('footer-pos-max', 'footer-pos-min');
-                modal.classList.replace('modal-pos-max', 'modal-pos-min');
-                modal.style.left = '65%';
-                modal.style.top = '65%';
-                this.player.minimized = true;
+                if (this.PageData.prevPages.length > 0) {
+                    backButton.show();
+                }
+                this.player.minimize();
             } else {
-                this.player.titleBar.windowControls.minimizeMaximize.icon.classList.replace('fa-expand-alt', 'fa-compress-alt');
-                this.player.titleBar.self.classList.replace('header-pos-min', 'header-pos-max');
-                this.player.controls.self.classList.replace('footer-pos-min', 'footer-pos-max');
-                modal.classList.replace('modal-pos-min', 'modal-pos-max');
-                modal.style.left = '0px';
-                modal.style.top = '0px';
-                this.player.minimized = false;
+                if (backButton.visible === true) {
+                    backButton.hide();
+                }
+                this.player.maximize();
             }
         };
+        this.player.titleBar.windowControls.playlist.button.onclick = () => this.player.togglePlaylist();
+        this.player.titleBar.windowControls.close.button.onclick = () => {
+            if (this.PageData.prevPages.length > 0) {
+                backButton.show();
+            }
 
-        this.player.titleBar.windowControls.playlist.button.onclick = () => console.log("clicked!");
-        this.player.titleBar.windowControls.close.button.onclick = () => modal.style.display = "none";
+            this.player.playlist.empty();
+            this.player.toggle();
+        }
+
+        this.player.playlist.viewer.close.button.onclick = () => this.player.togglePlaylist();
     }
-
 };
 
-const HOME = ".\/Videos";
-const MOVIES = ".\/Videos\/Movies";
-const SERIES = ".\/Videos\/Series";
-
 export {
-    ResourceLoader,
-    HOME,
-    MOVIES,
-    SERIES
+    ResourceLoader
 };

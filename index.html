@@ -38,6 +38,7 @@
       <li><button class="nav-item link" id="home"><i class="fas fa-home fa-2x"></i></button></li>
       <li><button class="nav-item link" id="movies"><i class="fas fa-film fa-2x"></i></button></li>
       <li><button class="nav-item link" id="series"><i class="fas fa-tv fa-2x"></i></button></li>
+      <li><button class="nav-item link" id="music"><i class="fas fa-music fa-2x"></i></button></li>
 
       <!-- search bar -->
         <li class="hidden" style="background-color: #28292C;">
@@ -54,18 +55,19 @@
 
     <!-- MIDDLE CONTAINER -->
     <div id="content">
+      <div class="go-back hidden"><i class="far fa-arrow-alt-circle-left fa-5x"></i></div>
       <div id="container"></div>
     </div>
     
     <!-- PlAYER -->
-    <div class="popup-modal modal-pos-max">
+    <div class="player-modal modal-pos-max">
           <div class="modal-container">
 
             <div class="title-bar header-pos-max op-0">
               <span class="text"></span>
               <span class="controls pr-8" id="show-playlist"><i class="fas fa-list"></i></span>
               <span class="controls pr-4" id="min-max"><i class="fas fa-compress-alt"></i></span>
-              <span class="controls" id="close"><i class="fas fa-window-close"></i></span>
+              <span class="controls" id="player-close"><i class="fas fa-window-close"></i></span>
             </div>
 
             <div class="player-controls footer-pos-max op-0">
@@ -99,6 +101,9 @@
     <!-- PLAYLIST -->
     <div class="playlist-container">
       <div class="playlist-modal">
+        <!-- <div> -->
+          <i class="fas fa-window-close" id="playlist-close"></i>
+        <!-- </div> -->
 
         <div class="playlist-modal-LHS">
           <div class="playlist-video-container"></div>
@@ -114,6 +119,5 @@
     </div>
     
     <script src="js/init.js" type="module"></script>
-    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
   </body>
 </html>
