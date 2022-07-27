@@ -8,15 +8,24 @@ import {
 }
 from "./utils/UI.js";
 
+import "./utils/Storage.js";
+
 const HOME = ".\/Videos";
 const MUSIC = ".\/Music";
 const MOVIES = ".\/Videos\/Movies";
 const SERIES = ".\/Videos\/Series";
 
+if (typeof localStorage.globalSettings === 'undefined') {
+    localStorage.setObject('globalSettings', {
+        Volume: 1,
+        History: {}
+    });
+}
+
 (async(loader) => {
 
     async function loadPage(page) {
-        if (loader.PageData.curr == page) 
+        if (loader.PageData.curr == page)
             return;
 
         return await load(page);
@@ -43,11 +52,11 @@ const SERIES = ".\/Videos\/Series";
                     keys
                 } = await loader.loadPage(data);
 
-                if (loader.PageData.prevPages.length > 0) 
+                if (loader.PageData.prevPages.length > 0)
                     backButton.show();
-                else if (loader.PageData.prevPages.length === 0) 
+                else if (loader.PageData.prevPages.length === 0)
                     backButton.hide();
-                
+
                 backButton.self.onclick = async() => await load(loader.prevPage);
 
                 for (let i = 0; i < collection.length; i++) {
@@ -55,7 +64,7 @@ const SERIES = ".\/Videos\/Series";
                     Poster.info.onclick = (event) => console.log(collection[i].Plot); ;
                     Poster.plus.onclick = async(event) => loader.controller.setTracks(loader.player, await loader.getPage(keys[i]));
                     Poster.wrapper.onclick = async(event) => {
-                        if (event.target.classList.contains("poster") === true) 
+                        if (event.target.classList.contains("poster") === true)
                             return;
 
                         if (nav.self.classList.contains("out")) {
@@ -68,13 +77,13 @@ const SERIES = ".\/Videos\/Series";
                 }
 
                 loader.updatePage()
-                
+
             }
         } catch (err) {
             console.error(err);
         }
     }
-    
+
     await load(HOME);
 
 })(new ResourceLoader());

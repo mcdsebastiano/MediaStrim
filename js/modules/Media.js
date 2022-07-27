@@ -13,7 +13,7 @@ class Player {
         this.playlist = new Playlist();
         this.minimized = false;
         this.visible = false;
-        this.trackId = 0;
+        this.trackID = 0;
 
         this.CurrentTime = document.getElementsByTagName("time")[0];
         this.Media = document.getElementById('media');
@@ -21,6 +21,8 @@ class Player {
         this.modal = document.getElementsByClassName("player-modal")[0];
         this.controls = playerControls;
         this.titleBar = titleBar;
+
+        this.history;
     }
 
     get tracks() {
@@ -48,8 +50,8 @@ class Player {
         this.modal.style.display = "none";
         this.visible = false;
 
-        //  remove the current source element from the DOM
-        document.getElementsByTagName('source')[0].remove();
+        let source = document.getElementsByTagName('source')[0];
+        source.remove();
 
         // destroy the DOM element.
         this.Media.pause();
@@ -166,6 +168,18 @@ class MediaController {
         let dur = player.Media.duration || 0;
         player.Media.currentTime = dur * percent;
     }
+    
+    
+    // FIXME: this is a bit broken
+    adjustVolume(player, vol) {
+        player.controls.Volume.slider.style.width = vol - player.controls.Volume.container.getBoundingClientRect().x + 'px';
+        player.Media.volume = player.controls.Volume.slider.getBoundingClientRect().width / 100;
+
+        if (player.Media.muted) {
+            setIcon(player.controls.Volume, 'fa-volume-up');
+            player.Media.muted = false;
+        }
+    }
 
     toggleMute(player) {
         if (player.Media.muted) {
@@ -181,69 +195,87 @@ class MediaController {
         }
     }
 
-    playTrack(player, id) {
+    async playTrack(player, id) {
         if (id >= player.tracks.length || id < 0)
             return;
-
-        player.playlist.viewer.self[player.trackId].classList.remove("active");
+        
+        player.playlist.viewer.self[player.trackID].classList.remove("active");
         player.playlist.viewer.self[id].classList.add("active");
 
-        const currentSrc = document.getElementsByTagName("source")[0];
+        let videoKey = player.tracks[id].path;
+        player.history = localStorage.getGlobal("History");
+        player.history[videoKey] = player.history[videoKey] || [];
+        
+       this.syncTracks(player);
 
-        if (typeof currentSrc !== "undefined") {
+        const currentSrc = document.getElementsByTagName("source")[0];
+        if (typeof currentSrc !== "undefined") 
             currentSrc.remove();
-        }
 
         const sourceElement = document.createElement("source");
         sourceElement.setAttribute("src", `${player.tracks[id].path}${player.tracks[id].source}`);
         player.Media.appendChild(sourceElement);
 
-        player.trackId = id;
+        player.trackID = id;
         player.Media.load();
-        this.togglePlay(player);
-    }
 
-    // FIXME: this is a bit broken
-    adjustVolume(player, vol) {
-        player.controls.Volume.slider.style.width = vol - player.controls.Volume.container.getBoundingClientRect().x + 'px';
-        player.Media.volume = player.controls.Volume.slider.getBoundingClientRect().width / 100;
-
-        if (player.Media.muted) {
-            setIcon(player.controls.Volume, 'fa-volume-up');
-            player.Media.muted = false;
+        if (typeof player.history[player.tracks[id].path][id] === "undefined") {
+            player.history[player.tracks[id].path].push({
+                title: player.tracks[id].title,
+                timestamp: 0,
+                source: sourceElement.src,
+                trackID: id,
+            });
+            localStorage.setGlobal("History", player.history);
+        } else {
+            player.Media.currentTime = player.history[player.tracks[id].path][id].timestamp
         }
+        
+        return await this.togglePlay(player);
+
     }
 
-    nextTrack(player) {
-        this.playTrack(player, player.trackId + 1);
+    syncTracks(player) {
+        if (typeof player.history[player.tracks[player.trackID].path][player.trackID] === "undefined")
+            return;
+
+        let timestamp = 0;
+        if (player.Media.currentTime < player.Media.duration)
+            timestamp = player.Media.currentTime;
+
+        player.history[player.tracks[player.trackID].path][player.trackID].timestamp = timestamp;
+        localStorage.setGlobal("History", player.history);
     }
 
-    prevTrack(player) {
-        this.playTrack(player, player.trackId - 1);
+    async nextTrack(player) {
+        return await this.playTrack(player, player.trackID + 1);
     }
 
-    play(player) {
+    async prevTrack(player) {
+        return await this.playTrack(player, player.trackID - 1);
+    }
+
+    async play(player) {
         if (player.Media.paused === false)
             return;
 
         setIcon(player.controls.Play, "fa-pause");
-        player.Media.play();
+        return await player.Media.play();
     }
 
-    pause(player) {
+    async pause(player) {
         if (player.Media.paused === true)
             return;
 
         setIcon(player.controls.Play, 'fa-play');
-        player.Media.pause();
+        return await player.Media.pause();
     }
 
-    togglePlay(player) {
+    async togglePlay(player) {
         if (player.Media.paused === false)
-            this.pause(player);
+            return await this.pause(player);
         else
-            this.play(player);
-
+            return await this.play(player);
     }
 
     setTracks(player, data) {
@@ -265,9 +297,7 @@ class MediaController {
         const playButton = document.createElement('i');
         playButton.classList.add('far', 'fa-play-circle', "fa-2x");
         listItem.appendChild(playButton);
-        playButton.onclick = (event) => {
-            this.playTrack(player, id);
-        };
+        playButton.onclick = event => this.playTrack(player, id);
 
         const playlistTitle = document.createElement('span');
         playlistTitle.id = id;
@@ -298,7 +328,6 @@ class MediaController {
 
         player.playlist.swap(i - 1, j - 1);
     }
-
 }
 
 export {

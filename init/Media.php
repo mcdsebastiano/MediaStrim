@@ -44,6 +44,8 @@ class Media {
 		$path = str_replace("&", "%26", $path);
 		$this->path = substr($path, 0, strrpos($path, "/"));
 		$this->source = substr($path, strrpos($path, "/"));
+        $chars = explode("/", $this->path);
+        $this->title = array_pop($chars);
 	}
 }
 

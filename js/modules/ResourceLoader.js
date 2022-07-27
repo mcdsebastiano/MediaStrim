@@ -33,7 +33,7 @@ class ResourceLoader {
         };
         this.coordinateEvents()
     };
-    
+
     get prevPage() {
         this.popPage();
         return this.PageData.prev;
@@ -67,13 +67,13 @@ class ResourceLoader {
             url: `content.php?dir=${page}`
         });
 
-        if (data.length === 0) 
+        if (data.length === 0)
             throw new Error("Error loading source: Directory doesn't exist....");
 
         if (typeof data[0] === "undefined") {
-            if (typeof this.PageData.curr !== "undefined" && page !== this.PageData.curr && page !== this.PageData.prev) 
+            if (typeof this.PageData.curr !== "undefined" && page !== this.PageData.curr && page !== this.PageData.prev)
                 this.PageData.prevPages.push(this.PageData.curr);
-                
+
             this.PageData.curr = page;
 
         }
@@ -82,23 +82,21 @@ class ResourceLoader {
     }
 
     loadPlayer(data) {
-        if (this.player.minimized === false && backButton.visible) 
+        if (this.player.minimized === false && backButton.visible)
             backButton.hide();
 
         if (this.player.visible == false)
             this.player.show();
 
         this.player.playlist.empty();
-        this.player.trackId = 0;
-
         this.controller.setTracks(this.player, data);
         this.controller.playTrack(this.player, 0);
     }
 
     async loadPage(data) {
-        if (this.PageData.prevPages.length > 0) 
+        if (this.PageData.prevPages.length > 0)
             backButton.show()
-        
+
         removeAllChildrenFrom(container);
         undoFragment();
 
@@ -115,15 +113,15 @@ class ResourceLoader {
     }
 
     popPage() {
-        if(this.PageData.prevPages.length === 0) 
+        if (this.PageData.prevPages.length === 0)
             return;
-        
+
         this.PageData.prev = this.PageData.prevPages.pop();
     }
 
     async getPosters(data) {
         return Object.keys(data).map(async(key) => {
-            if (data[key] === null) 
+            if (data[key] === null)
                 data[key] = {};
 
             data[key].title = key.split("\/").pop();
@@ -145,7 +143,7 @@ class ResourceLoader {
     coordinateEvents() {
         window.onkeydown = event => {
             if (event.keyCode === 32)
-                this.player.controller.togglePlaying();
+                this.controller.togglePlay(this.player);
         }
 
         this.player.controls.Play.button.onclick = () => this.controller.togglePlay(this.player);
@@ -164,8 +162,8 @@ class ResourceLoader {
             this.player.CurrentTime.textContent = `${printFormattedTime(this.player.Media.currentTime)}`;
         });
 
-        this.player.Media.onended = () => this.controller.nextTrack(this.player);
-
+        this.player.Media.onended = async event => await this.controller.nextTrack(this.player);
+        
         this.player.titleBar.windowControls.minimizeMaximize.button.onclick = () => {
             if (this.player.minimized === false) {
                 if (this.PageData.prevPages.length > 0) {
