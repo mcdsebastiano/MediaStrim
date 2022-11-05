@@ -23,21 +23,18 @@ if (typeof localStorage.globalSettings === 'undefined') {
 }
 
 (async(loader) => {
-
-    async function loadPage(page) {
-        if (loader.PageData.curr == page)
-            return;
-
-        return await load(page);
-    }
-
+    
     nav.slider.onclick = () => nav.toggle();
     nav.homeButton.onclick = async() => await loadPage(HOME);
     nav.moviesButton.onclick = async() => await loadPage(MOVIES);
     nav.seriesButton.onclick = async() => await loadPage(SERIES);
     nav.musicButton.onclick = async() => await loadPage(MUSIC);
 
-    async function load(page) {
+    async function loadPage(page) {
+        
+        if (loader.PageData.curr == page)
+            return;
+        
         try {
             const data = await loader.getPage(page);
 
@@ -57,9 +54,10 @@ if (typeof localStorage.globalSettings === 'undefined') {
                 else if (loader.PageData.prevPages.length === 0)
                     backButton.hide();
 
-                backButton.self.onclick = async() => await load(loader.prevPage);
+                backButton.self.onclick = async() => await loadPage(loader.prevPage);
 
                 for (let i = 0; i < collection.length; i++) {
+                    
                     const Poster = loader.createPoster(collection[i]);
                     Poster.info.onclick = (event) => console.log(collection[i].Plot); ;
                     Poster.plus.onclick = async(event) => loader.controller.setTracks(loader.player, await loader.getPage(keys[i]));
@@ -72,8 +70,9 @@ if (typeof localStorage.globalSettings === 'undefined') {
                             return;
                         }
 
-                        await load(keys[i]);
+                        return await loadPage(keys[i]);
                     };
+                    
                 }
 
                 loader.updatePage()
@@ -84,6 +83,6 @@ if (typeof localStorage.globalSettings === 'undefined') {
         }
     }
 
-    await load(HOME);
+    await loadPage(HOME);
 
 })(new ResourceLoader());

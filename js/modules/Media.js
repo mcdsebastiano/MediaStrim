@@ -47,6 +47,14 @@ class Player {
     }
 
     hide() {
+
+        // console.log(this.history[this.playlist.tracks[this.trackID].path][this.trackID]);
+        // console.log(this.history[this.playlist.tracks[this.trackID].path]);
+
+        // this.history[this.playlist.tracks[this.trackID].path][this.trackID].timestamp = this.Media.currentTime
+        // localStorage.setGlobal("History", this.history);
+
+        this.playlist.empty();
         this.modal.style.display = "none";
         this.visible = false;
 
@@ -168,8 +176,7 @@ class MediaController {
         let dur = player.Media.duration || 0;
         player.Media.currentTime = dur * percent;
     }
-    
-    
+
     // FIXME: this is a bit broken
     adjustVolume(player, vol) {
         player.controls.Volume.slider.style.width = vol - player.controls.Volume.container.getBoundingClientRect().x + 'px';
@@ -198,18 +205,18 @@ class MediaController {
     async playTrack(player, id) {
         if (id >= player.tracks.length || id < 0)
             return;
-        
+
         player.playlist.viewer.self[player.trackID].classList.remove("active");
         player.playlist.viewer.self[id].classList.add("active");
 
         let videoKey = player.tracks[id].path;
         player.history = localStorage.getGlobal("History");
         player.history[videoKey] = player.history[videoKey] || [];
-        
-       this.syncTracks(player);
+
+        this.syncTracks(player);
 
         const currentSrc = document.getElementsByTagName("source")[0];
-        if (typeof currentSrc !== "undefined") 
+        if (typeof currentSrc !== "undefined")
             currentSrc.remove();
 
         const sourceElement = document.createElement("source");
@@ -224,13 +231,13 @@ class MediaController {
                 title: player.tracks[id].title,
                 timestamp: 0,
                 source: sourceElement.src,
-                trackID: id,
+                trackID: id
             });
             localStorage.setGlobal("History", player.history);
         } else {
             player.Media.currentTime = player.history[player.tracks[id].path][id].timestamp
         }
-        
+
         return await this.togglePlay(player);
 
     }

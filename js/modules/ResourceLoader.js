@@ -68,7 +68,7 @@ class ResourceLoader {
         });
 
         if (data.length === 0)
-            throw new Error("Error loading source: Directory doesn't exist....");
+            throw new Error("Error loading source: Directory is empty...");
 
         if (typeof data[0] === "undefined") {
             if (typeof this.PageData.curr !== "undefined" && page !== this.PageData.curr && page !== this.PageData.prev)
@@ -90,13 +90,17 @@ class ResourceLoader {
 
         this.player.playlist.empty();
         this.controller.setTracks(this.player, data);
-        this.controller.playTrack(this.player, 0);
+        
+        let path = data[0].path;
+        let playID = 0;
+        if(typeof this.player.history !== "undefined") {
+            playID= Math.max.apply(Math, this.player.history[path].map(item => item.trackID));
+        }
+        
+        this.controller.playTrack(this.player, playID);
     }
 
     async loadPage(data) {
-        if (this.PageData.prevPages.length > 0)
-            backButton.show()
-
         removeAllChildrenFrom(container);
         undoFragment();
 
@@ -123,8 +127,13 @@ class ResourceLoader {
         return Object.keys(data).map(async(key) => {
             if (data[key] === null)
                 data[key] = {};
-
-            data[key].title = key.split("\/").pop();
+            
+            const exploded = key.split("\/");
+            if(exploded.length < 4) {
+                return {};
+            }
+            data[key].title = exploded.pop();
+            
             const search = data[key].title.replace(/\s/gi, '%20');
 
             return await this.newHttpRequest({
@@ -183,7 +192,6 @@ class ResourceLoader {
                 backButton.show();
             }
 
-            this.player.playlist.empty();
             this.player.toggle();
         }
 
